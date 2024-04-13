@@ -1,0 +1,240 @@
+Parameters:
+  BucketName:
+    Type: String
+    Default: termassignment-b00958501-s3-bucket
+  SecretKeyName:
+    Type: String
+    Default: termassignment-b00958501-secretname
+  SnsTopicName:
+    Type: String
+    Default: termassignmentb00958501sns
+  KeyName:
+    ConstraintDescription: Existing EC2 KeyPair.
+    Description: Cloud key-v1
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: vockey
+  DocumentTableName:
+    Type: String
+    Default: document
+  UserTableName:
+    Type: String
+    Default: user
+  AwsAccessKey:
+    Type: String
+    Default: AWS_ACCESS_KEY
+  AwsSecretAccessKey:
+    Type: String
+    Default: AWS_SECRET_ACCESS_KEY
+  AwsSessionToken:
+    Type: String
+    Default: AWS_SESSION_TOKEN
+
+Resources:
+  ####### S3 Bucket #######
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: termassignment-b00958501-s3-bucket
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+  #S3 OAI
+  S3OriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "OriginAccessIdentity - S3"
+      
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowCloudFrontAccess"
+            Effect: Allow
+            Principal:
+              CanonicalUser: !GetAtt S3OriginAccessIdentity.S3CanonicalUserId
+            Action: "s3:GetObject"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref S3Bucket
+                - "/*"
+
+  #Cloudfront
+  S3CloudFront:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - S3Bucket
+      - S3OriginAccessIdentity
+    Properties:
+      DistributionConfig:
+        Comment: CloudFront Distribution - v1
+        Origins:
+          - DomainName: !GetAtt S3Bucket.DomainName
+            Id: s3OriginId
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub  "origin-access-identity/cloudfront/${S3OriginAccessIdentity}"
+        Enabled: true
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            - PUT
+            - POST
+            - PATCH
+            - DELETE
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          TargetOriginId: s3OriginId
+        PriceClass: PriceClass_All
+
+  #SNS
+  MySNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: "Emails on file upload"
+      TopicName: !Ref SnsTopicName
+
+  MySecret:
+    Type: "AWS::SecretsManager::Secret"
+    DependsOn:
+      - S3CloudFront
+      - MySNSTopic
+    Properties:
+      Name: !Ref SecretKeyName
+      Description: "Secret Manager, table names"
+      SecretString: !Sub |
+        {"Table_Name_Document":"${DocumentTableName}","Table_Name_User":"${UserTableName}"}
+
+  #Backend EC2 security group added.
+  BackendEC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic to port 5000
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 5500
+          ToPort: 5500
+          CidrIp: 0.0.0.0/0
+    DependsOn:
+      - S3CloudFront
+      - S3Bucket
+      - S3BucketPolicy
+      - MySNSTopic
+
+
+  #Instance created
+  BackendEC2Instance:
+    Type: AWS::EC2::Instance
+    DependsOn:
+      - MySecret
+      - S3CloudFront
+      - S3Bucket
+      - S3BucketPolicy
+      - MySNSTopic
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-00c39f71452c08778
+      KeyName: vockey
+      SecurityGroupIds:
+        - !Ref BackendEC2InstanceSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo yum install -y docker
+          sudo systemctl start docker
+          sudo docker pull shyamal24/backend:latest
+          touch /fileshare.db
+          cat <<EOF > /env
+          DB_PATH=/fileshare.db
+          PORT=5500
+          AWS_SECRETS_MANAGER_SECRET_ID=${SecretKeyName}
+          AWS_REGION=${AWS::Region}
+          AWS_ACCESS_KEY_ID=${AwsAccessKey}
+          AWS_SECRET_ACCESS_KEY=${AwsSecretAccessKey}
+          S3_BUCKET_NAME=${BucketName}
+          AWS_SESSION_TOKEN=${AwsSessionToken}
+          CLOUDFRONT_URL=${S3CloudFront.DomainName}
+          SNS_TOPIC_ARN=${MySNSTopic.TopicArn}
+          EOF
+          sudo docker run --env-file /env -p 5500:5500 shyamal24/backend:latest
+
+
+  # EBS
+  EBSApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      Description: EBS Frontend
+  EBSApplicationVersion:
+    Type: AWS::ElasticBeanstalk::ApplicationVersion
+    Properties:
+      ApplicationName: !Ref EBSApplication
+      Description: EBS Frontend Version 1.0
+      SourceBundle:
+        S3Bucket: ebs-fileshare-b00958501
+        S3Key: Archive.zip
+  EBSConfigurationTemplate:
+    Type: AWS::ElasticBeanstalk::ConfigurationTemplate
+    Properties:
+      ApplicationName: !Ref EBSApplication
+      Description: EBS Frontend Configuration Template
+      OptionSettings:
+        - Namespace: "aws:elasticbeanstalk:application:environment"
+          OptionName: "NODE_ENV"
+          Value: "production"
+        - Namespace: "aws:elasticbeanstalk:environment"
+          OptionName: "EnvironmentType"
+          Value: "SingleInstance"
+        - Namespace: "aws:elasticbeanstalk:environment"
+          OptionName: "ServiceRole"
+          Value: "LabRole"
+        - Namespace: "aws:autoscaling:launchconfiguration"
+          OptionName: "EC2KeyName"
+          Value: "vockey"
+        - Namespace: "aws:autoscaling:launchconfiguration"
+          OptionName: "IamInstanceProfile"
+          Value: !Ref MyInstanceProfile
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: REACT_APP_API_URL
+          Value: !Sub | 
+            "http://${BackendEC2Instance.PublicIp}:5500"
+      SolutionStackName: 64bit Amazon Linux 2023 v6.1.2 running Node.js 20
+  EBSEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    DependsOn:
+      - BackendEC2Instance
+    Properties:
+      ApplicationName: !Ref EBSApplication
+      Description: EBS Backend
+      TemplateName: !Ref EBSConfigurationTemplate
+      VersionLabel: !Ref EBSApplicationVersion
+  MyInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - LabRole

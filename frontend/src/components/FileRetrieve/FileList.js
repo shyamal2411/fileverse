@@ -55,7 +55,8 @@ const FileList = () => {
               {files.map((fileUrl, index) => {
                 console.log(fileUrl);
                 const fileNameWithUuid = fileUrl.split("/").pop();
-                const originalFileName = fileNameWithUuid.split("_");
+                console.log(fileNameWithUuid);
+                const originalFileName = fileNameWithUuid.split("_")[1];
                 console.log(originalFileName);
                 return (
                   <tr key={index}>

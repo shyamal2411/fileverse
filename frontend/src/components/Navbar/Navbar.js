@@ -14,6 +14,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   let Links = [
     { name: "HOME", link: "/" },
+    { name: "UPLOAD", link: "/fileupload" },
     { name: "FILES", link: "/filelist" },
   ];
 

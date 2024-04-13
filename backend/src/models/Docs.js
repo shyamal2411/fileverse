@@ -8,9 +8,9 @@ import {
 import { User } from "./User.js";
 import secretValueGet from "../services/secretService.js";
 
-const secretValue = "termassignment-b00958501-secretname";
+const secretValue = process.env.SECRET_NAME;
 
-const secretValueRes = await secretValueGet(secretValue);
+const secretValueRes = secretValueGet(secretValue);
 console.log(
   "----------------- Secret Value -------------------",
   secretValueRes?.Table_Name_Document

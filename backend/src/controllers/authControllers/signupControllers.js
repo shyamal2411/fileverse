@@ -13,7 +13,11 @@ export const signup = async (req, res) => {
     }
     console.log("****************Before****************");
     const connection = AppDataSource;
-    console.log("****************Working****************");
+    console.log(
+      "****************Working****************",
+      connection.getRepository(User)
+    );
+    console.log("****************After****************");
     const userRepository = connection.getRepository(User);
 
     let existingUser = await userRepository.findOne({ where: { email } });

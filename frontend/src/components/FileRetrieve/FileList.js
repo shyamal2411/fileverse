@@ -53,18 +53,17 @@ const FileList = () => {
             </thead>
             <tbody>
               {files.map((fileUrl, index) => {
+                console.log(fileUrl);
                 const fileNameWithUuid = fileUrl.split("/").pop();
-                const originalFileName = fileNameWithUuid
-                  .split("_")
-                  .slice(1)
-                  .join("_");
+                const originalFileName = fileNameWithUuid.split("_");
+                console.log(originalFileName);
                 return (
                   <tr key={index}>
                     <td className="border px-4 py-2">{originalFileName}</td>
                     <td className="border text-blue-400 px-4 py-2">
                       Link -{" "}
-                      <a target="_blank" href={`http://${fileUrl}`}>
-                        http://{fileUrl}
+                      <a target="_blank" href={`${fileUrl}`}>
+                        {fileUrl}
                       </a>
                     </td>
                   </tr>

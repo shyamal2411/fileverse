@@ -17,11 +17,11 @@ export const uploadFiles = async (req, res) => {
     const connection = AppDataSource;
     const documentRepository = connection.getRepository(Document);
     const userRepository = connection.getRepository(User);
-
     const files = req.files;
+    // const files = s3Uploadv2(getFileName);
     // const userEmail = req.body.email;
     const token = req.header("Authorization").split(" ")[1];
-    const topicArn = process.env.SNS_TOPIC_ARN;
+    // const topicArn = process.env.SNS_TOPIC_ARN;
 
     const userId = jwt.verify(token, "secretKey").user.id;
     // console.log(jwt.verify(token, "secretKey"));
@@ -30,22 +30,25 @@ export const uploadFiles = async (req, res) => {
     const userEmail = user.email;
     console.log("------------------USER EMAIL----------------", userEmail);
     const result = await s3Uploadv2(files, userId, userEmail);
-    console.log(result);
+    console.log("RSEASDFASDF -----------------", result);
+    console.log("FILES -----------------", files);
+    console.log("UPLOAD FILES -----------------", uploadFiles);
     for (const file of result) {
       await documentRepository.save({
-        url: file.key,
+        url: file,
         userId: userId,
       });
     }
+
     // const getDocument = await getPresigned(result);
     // console.log(getDocument);
     console.log("req.files", req.files);
     console.log("----------------result----------------", result);
     // use SnsService to publish to SNS
-    const message = "file uploaded";
+    // const message = "file uploaded";
     const email = userEmail;
-    const responseSubs = await subscribeToSns(topicArn, email);
-    const response = await publishToSns(message, topicArn, email);
+    // const responseSubs = await subscribeToSns(topicArn, email);
+    // const response = await publishToSns(message, topicArn, email);
     res.json({ status: "File uploaded successfully", result });
   } catch (error) {
     res.status(400).json({ error: error.message });

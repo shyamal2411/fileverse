@@ -17,7 +17,7 @@ export const getFiles = async (req, res) => {
 
     const token = req.header("Authorization").split(" ")[1];
     const userId = jwt.verify(token, "secretKey").user.id;
-    const topicArn = process.env.SNS_TOPIC_ARN;
+    // const topicArn = process.env.SNS_TOPIC_ARN;
     const documents = await documentRepository.findBy({ userId });
     const user = await userRepository.findOneBy({ id: userId });
     // const email = user.email;
@@ -32,12 +32,10 @@ export const getFiles = async (req, res) => {
       getStrings.push(presignedGETURL);
     }
 
-    // return getStrings;
     const message = `Files shared, ${getStrings}`;
-    // console.log("Below are the URLS", getStrings);
 
-    const responseSubs = await subscribeToSns(topicArn, email);
-    const response = await publishToSns(message, topicArn, email);
+    // const responseSubs = await subscribeToSns(topicArn, email);
+    // const response = await publishToSns(message, topicArn, email);
     res.json({ files: getStrings });
     // getPresigned(documents.map((doc) => doc.url));
   } catch (error) {

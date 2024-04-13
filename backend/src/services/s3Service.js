@@ -1,11 +1,10 @@
-import AWS from "aws-sdk";
+import { S3, PutObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 
 export const s3Uploadv2 = async (files) => {
   console.log("File: ", files);
-  // console.log(process.env);
-  // AWS.config.update({ region: "us-east-1" });
-  const s3 = new AWS.S3({
+
+  const s3 = new S3({
     region: process.env.AWS_REGION,
     credentials: {
       accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -13,13 +12,9 @@ export const s3Uploadv2 = async (files) => {
       sessionToken: process.env.AWS_SESSION_TOKEN,
     },
   });
-  console.log("@@@@@@@@@@@@@@");
-  // console.log(files);
-  // const params = {
-  //   Bucket: process.env.S3_BUCKET_NAME,
-  //   Key: `uploads-files/${uuid().substring(0, 4)}-${file.originalname}`,
-  //   Body: file.buffer,
-  // };
+
+  console.log("***************S3 Service*****************");
+
   const params = files.map((file) => {
     return {
       Bucket: process.env.S3_BUCKET_NAME,
@@ -27,9 +22,14 @@ export const s3Uploadv2 = async (files) => {
       Body: file.buffer,
     };
   });
-  console.log(params);
+  const getFileName = params.map((param) => param.Key);
+  console.log("File name: ", getFileName);
   try {
-    return await Promise.all(params.map((param) => s3.upload(param).promise()));
+    const uploadPromises = params.map((param) =>
+      s3.send(new PutObjectCommand(param))
+    );
+    await Promise.all(uploadPromises);
+    return getFileName;
   } catch (error) {
     console.log(error);
     throw error;

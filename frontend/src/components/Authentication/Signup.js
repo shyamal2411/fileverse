@@ -59,7 +59,7 @@ const Signup = () => {
   return (
     <>
       <ToastContainer />
-      <div className="flex flex-col  items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+      <div className="flex flex-col bg-gradient-to-b from-blue-500 to-purple-700 text-white items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-slate-300 rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl ">
@@ -152,7 +152,7 @@ const Signup = () => {
                       checked={terms}
                       onChange={() => setTerms(!terms)}
                     />
-                    <span className="text-sm">
+                    <span className="text-sm text-black">
                       Subscribe to the{" "}
                       <span className="text-blue-700 font-semibold">
                         email services
@@ -164,11 +164,11 @@ const Signup = () => {
               <button
                 type="submit"
                 onClick={callLogin}
-                className="w-full text-white bg-black focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                className="w-full bg-black focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
               >
                 Create an account
               </button>
-              <p className="text-sm">
+              <p className="text-sm text-black">
                 Already have an account?{" "}
                 <Link to={"/login"}>
                   <span className="font-medium cursor-pointer text-blue-700 hover:underline">

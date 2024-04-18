@@ -5,6 +5,7 @@ import Signup from "./components/Authentication/Signup";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import FileUpload from "./components/FileUpload/FileUpload";
 import FileList from "./components/FileRetrieve/FileList";
+import Home from "./components/Home/Home";
 
 const App = () => {
   return (
@@ -12,7 +13,7 @@ const App = () => {
       <Router>
         <Navbar />
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/fileupload" element={<FileUpload />} />

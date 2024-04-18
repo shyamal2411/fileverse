@@ -18,21 +18,17 @@ export const uploadFiles = async (req, res) => {
     const documentRepository = connection.getRepository(Document);
     const userRepository = connection.getRepository(User);
     const files = req.files;
-    // const files = s3Uploadv2(getFileName);
-    // const userEmail = req.body.email;
+
     const token = req.header("Authorization").split(" ")[1];
     // const topicArn = process.env.SNS_TOPIC_ARN;
 
     const userId = jwt.verify(token, "secretKey").user.id;
-    // console.log(jwt.verify(token, "secretKey"));
-    console.log("+++++++++++USER ID++++++++++++++++++++", userId);
+
     const user = await userRepository.findOneBy({ id: userId });
     const userEmail = user.email;
-    console.log("------------------USER EMAIL----------------", userEmail);
+
     const result = await s3Uploadv2(files, userId, userEmail);
-    console.log("RSEASDFASDF -----------------", result);
-    console.log("FILES -----------------", files);
-    console.log("UPLOAD FILES -----------------", uploadFiles);
+
     for (const file of result) {
       await documentRepository.save({
         url: file,
@@ -40,10 +36,6 @@ export const uploadFiles = async (req, res) => {
       });
     }
 
-    // const getDocument = await getPresigned(result);
-    // console.log(getDocument);
-    console.log("req.files", req.files);
-    console.log("----------------result----------------", result);
     // use SnsService to publish to SNS
     // const message = "file uploaded";
     const email = userEmail;

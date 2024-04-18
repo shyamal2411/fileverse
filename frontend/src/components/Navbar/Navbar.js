@@ -29,11 +29,11 @@ const Navbar = () => {
 
   return (
     <div className="fixed  left-0 top-0 z-10 w-full shadow-md">
-      <div className="items-center justify-between bg-slate-700 px-7 py-4 md:flex md:px-10">
+      <div className="items-center justify-between bg-slate-300 px-7 py-4 md:flex md:px-10">
         {/* logo section */}
         <Link
           to={"/"}
-          className="flex cursor-pointer text-white items-center gap-1 text-2xl font-bold"
+          className="flex cursor-pointer  items-center gap-1 text-2xl font-bold"
         >
           <span>FileShare</span>
         </Link>
@@ -58,7 +58,7 @@ const Navbar = () => {
             <li className="my-7 font-semibold md:my-0 md:ml-8">
               <a
                 href={link.link}
-                className="text-white duration-500 hover:text-orange-400"
+                className=" duration-500 hover:text-orange-400"
               >
                 {link.name}
               </a>
@@ -85,7 +85,7 @@ const Navbar = () => {
           ) : (
             <Link
               to="/signup"
-              className="btn rounded bg-orange-500 px-3 py-1 font-semibold text-white duration-500 hover:bg-orange-700 md:static md:ml-8"
+              className="btn rounded bg-orange-500 px-3 py-1 font-semibold  duration-500 hover:bg-orange-700 md:static md:ml-8"
             >
               Sign Up
             </Link>

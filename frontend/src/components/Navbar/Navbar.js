@@ -48,7 +48,7 @@ const Navbar = () => {
             <FontAwesomeIcon icon={faBarsStaggered} />
           )}
         </div>
-        {/* linke items */}
+        {/* link items */}
         <ul
           className={`absolute left-0 z-[-1] w-full pb-12 pl-9 transition-all duration-500 ease-in md:static md:z-auto md:flex md:w-auto md:items-center md:pb-0 md:pl-0 ${
             open ? "top-12" : "top-[-490px]"

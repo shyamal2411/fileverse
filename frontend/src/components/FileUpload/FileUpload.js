@@ -20,14 +20,12 @@ const FileUpload = () => {
   };
 
   useEffect(() => {
-    // Add this useEffect hook
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login"); // Redirect to the login page if token is not present
+      navigate("/login");
     }
-  }, [navigate]); // Include navigate in the dependency array
+  }, [navigate]);
 
-  // Combined function to handle file upload and merge
   const handleFileAction = async (url) => {
     const formData = new FormData();
     files.forEach((file) => {
@@ -63,7 +61,6 @@ const FileUpload = () => {
     }
   };
 
-  // Function to handle file drop
   const handleFileDrop = (e) => {
     e.preventDefault();
     const newFiles = [...files];
@@ -92,7 +89,7 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gradient-to-b from-blue-500 to-purple-700 text-white">
+    <div className="flex items-center justify-center h-screen    ">
       <div className=" p-7 rounded w-[35%] mx-auto bg-slate-300">
         <div className="relative flex flex-col p-4 text-gray-400 border border-gray-600 rounded">
           <div className="relative flex flex-col text-gray-400 border border-gray-600 border-dashed rounded cursor-pointer">
@@ -160,6 +157,12 @@ const FileUpload = () => {
             >
               Merge Files
             </button>
+            {/* <button
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+              onClick={() => handleFileAction("/api/convert-pdf-to-docx")}
+            >
+              Convert PDF to DOCX
+            </button> */}
           </div>
 
           {/* File display */}

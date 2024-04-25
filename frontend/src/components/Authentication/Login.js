@@ -47,7 +47,7 @@ const Login = () => {
   return (
     <>
       <ToastContainer />
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 h-screen bg-gradient-to-b from-blue-500 to-purple-700 text-white">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0 h-screen    ">
         <div className="w-full bg-slate-300 rounded-lg shadow-xl border-2 md:mt-0 sm:max-w-md xl:p-0 z-50">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight items-center tracking-tight text-gray-900 md:text-2xl ">

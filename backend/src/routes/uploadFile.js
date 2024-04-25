@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { uploadFiles } from "../controllers/fileControllers/fileControllers.js";
 import multer from "multer";
 import { mergeAndUploadPdf } from "../controllers/fileControllers/mergeFilesControllers.js";
+// import { convertPdfToDocx } from "../controllers/fileControllers/convertPdfToDocController.js";
 
 dotenv.config();
 
@@ -28,5 +29,6 @@ const upload = multer({
 });
 router.post("/upload", upload.array("file"), uploadFiles);
 router.post("/merge-files", upload.array("file"), mergeAndUploadPdf);
+// router.post("/convert-pdf-to-docx", upload.single("file"), convertPdfToDocx);
 
 export default router;

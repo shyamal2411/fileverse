@@ -65,33 +65,31 @@ const FileList = () => {
     <>
       <ToastContainer />
 
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-500 to-purple-700 text-black">
+      <div className="flex justify-center items-center min-h-screen text-black">
         <div className="w-full max-w-2xl p-4">
-          <h2 className="text-2xl font-bold mb-4 mt-20 text-center underline uppercase text-slate-200">
+          <h2 className="text-2xl font-bold mb-4 mt-20 text-center underline uppercase">
             Your Files
           </h2>
-          <div className="flex flex-col items-center justify-center w-full">
-            <table className="table-auto flex flex-col w-full lg:w-full items-center border-2 border-black rounded-xl">
+          <div className="flex flex-col items-center justify-center w-full overflow-x-auto">
+            <table className="table-fixed w-full border-collapse border border-black rounded-xl">
               <thead>
-                <tr>
-                  <th className="px-4 py-2 text-left text-black">File Name</th>
-                  <th className="px-4 py-2 text-left text-black">
-                    Share Copy Link
-                  </th>
+                <tr className="bg-slate-300 underline">
+                  <th className="w-3/4 px-4 py-2">File Name</th>
+                  <th className="w-1/4 px-4 py-2">Share Copy Link</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="overflow-y-auto max-h-96">
                 {files.map((fileUrl, index) => {
                   const fileNameWithUuid = fileUrl.split("/").pop();
                   const originalFileName = fileNameWithUuid.split("_")[1];
                   return (
-                    <tr key={index} className="bg-slate-300">
-                      <td className="border-2 border-black px-4 py-2 text-black">
+                    <tr key={index} className="bg-gray-100 hover:bg-gray-200">
+                      <td className="border border-black px-4 py-2">
                         {originalFileName}
                       </td>
-                      <td className="border-2 border-black px-4 py-2">
+                      <td className="border border-black px-4 py-2">
                         <button
-                          className="bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
                           onClick={() => copyToClipboard(fileUrl)}
                         >
                           Copy Link
